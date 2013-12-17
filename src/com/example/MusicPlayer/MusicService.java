@@ -72,7 +72,7 @@ public class MusicService extends Service {
 			public void run() {
 				// TODO Auto-generated method stub
 				mCurrentDuration = mp.getCurrentPosition();
-				Log.e(TAG, "mCurrentDuration is "+mCurrentDuration);
+				//Log.e(TAG, "mCurrentDuration is "+mCurrentDuration);
 				sendBroadcastIntent(MusicService.DURATION_CHANGE, mCurrentDuration);
 			}
 		};
@@ -82,11 +82,11 @@ public class MusicService extends Service {
 	public void onDestroy() {
 		// TODO Auto-generated method stub
 		if(mp!=null){
-			if(mp.isPlaying()){
-				mp.pause();
-			}else{
-				mp.start();
-			}
+				mp.stop();
+				mp.release();
+				unregisterReceiver(mCommandReceiver);
+				mTimer.cancel();
+				mMusicStatus = UNKNOWN;
 		}
 		super.onDestroy();
 	}
@@ -116,7 +116,7 @@ public class MusicService extends Service {
 		}
 
 		mMusicStatus = MusicService.PLAY;
-		mTimer.schedule(mTask, 500, 500);
+		mTimer.schedule(mTask, 1000, 1000);
 		mDuration = mp.getDuration();
 		sendBroadcastIntent(MusicService.DURATION,mDuration);
 		sendBroadcastIntent(MusicService.MUSIC_STATUS,mMusicStatus);
@@ -140,6 +140,7 @@ public class MusicService extends Service {
 			if(action.equals(MusicPlayer.CHANGE_DURATION)){
 				bdBundle = intent.getExtras();
 				mCurrentDuration = bdBundle.getInt(MusicPlayer.CHANGE_DURATION);
+				//Log.e(TAG, ""+mCurrentDuration);
 				if(mp!=null){
 					mp.seekTo(mCurrentDuration);
 				}
@@ -147,7 +148,7 @@ public class MusicService extends Service {
 				bdBundle = intent.getExtras();
 				switch (bdBundle.getInt(MusicService.MUSIC_CONTROL)) {
 				case MusicService.PLAY:
-					if(mMusicStatus == MusicService.PAUSE && (!mp.isPlaying())){
+					if(!mp.isPlaying()){
 						mp.start();
 						sendBroadcastIntent(MusicService.MUSIC_STATUS, MusicService.PLAY);
 						mMusicStatus = MusicService.PLAY;
