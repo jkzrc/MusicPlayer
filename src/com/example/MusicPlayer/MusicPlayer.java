@@ -38,10 +38,10 @@ public class MusicPlayer extends Activity {
 		// TODO Auto-generated method stub
 		super.onDestroy();
 		Log.e(TAG, "onDestroy");
-		Intent intent = new Intent();
-		intent.setClass(MusicPlayer.this, MusicService.class);
-		stopService(intent);
-		mMusicStatus = MusicService.UNKNOWN;
+//		Intent intent = new Intent();
+//		intent.setClass(MusicPlayer.this, MusicService.class);
+//		stopService(intent);
+//		mMusicStatus = MusicService.UNKNOWN;
 	}
 
 	@Override
@@ -65,8 +65,9 @@ public class MusicPlayer extends Activity {
 		super.onResume();
 		setupReceiver();
 		Log.e(TAG, "onResume");
-		//mMusicSeekBar.setMax(mDuration);
-		//updateUI();
+		Intent intent = new Intent();
+		intent.setAction(MusicService.GET_CURRENT_STATUS);
+		sendBroadcast(intent);
 	}
 
 	@Override
@@ -214,7 +215,6 @@ public class MusicPlayer extends Activity {
 				bundle = intent.getExtras();
 				mMusicStatus = bundle.getInt(MusicService.MUSIC_STATUS);
 			}
-			
 			updateUI();
 		}
 

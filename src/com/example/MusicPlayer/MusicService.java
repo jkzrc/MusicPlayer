@@ -20,6 +20,7 @@ public class MusicService extends Service {
 	public static final String DURATION="MusicService.DURATION";
 	public static final String DURATION_CHANGE="MusicService.CURRENT_DURATION";
 	public static final String MUSIC_STATUS="MusicService.MUSIC_STATUS";
+	public static final String GET_CURRENT_STATUS="MusicService.GET_CURRENT_STATUS";
 
 	public static final int UNKNOWN = -1;
 	public static final int PLAY = 0;
@@ -63,6 +64,7 @@ public class MusicService extends Service {
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(MusicService.MUSIC_CONTROL);
 		filter.addAction(MusicPlayer.CHANGE_DURATION);
+		filter.addAction(MusicService.GET_CURRENT_STATUS);
 		registerReceiver(mCommandReceiver, filter);
 	}
 	private void createTimerTask() {
@@ -74,6 +76,7 @@ public class MusicService extends Service {
 				mCurrentDuration = mp.getCurrentPosition();
 				//Log.e(TAG, "mCurrentDuration is "+mCurrentDuration);
 				sendBroadcastIntent(MusicService.DURATION_CHANGE, mCurrentDuration);
+				//sendBroadcastIntent(MusicService.DURATION,mDuration);
 			}
 		};
 	}
@@ -103,6 +106,7 @@ public class MusicService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// TODO Auto-generated method stub
 		Bundle bdBundle;
+		if(intent == null) return -1;
 		bdBundle = intent.getExtras();
 		String string;
 		string = bdBundle.getString(MusicPlayer.MUSIC_SOURCE);
@@ -166,6 +170,9 @@ public class MusicService extends Service {
 				default:
 					break;
 				} 
+			}else if(action.equals(MusicService.GET_CURRENT_STATUS)){
+				sendBroadcastIntent(MusicService.DURATION,mDuration);
+				sendBroadcastIntent(MusicService.DURATION_CHANGE, mCurrentDuration);
 			}
 		}
 
